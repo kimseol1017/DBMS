@@ -71,7 +71,7 @@ where hiredate like '81%';
 
 select ename , job
 from employee
-where job <> 'MANAGER'
+where manager is null
 order by job ASC;
 
 --11. 커밋션을 받을 수 있는 자격이 되는 사원의 이름, 급여, 커미션을 출력하되 급여 및 커밋션을 기준으로 내림차순 정렬하여 표시하시오.
@@ -91,7 +91,7 @@ from employee
 where instr(ename, 'A') <> 0 and instr(ename, 'E') <> 0
 
 --14 .담당 업무가 사무원(CLERK) 또는 영업사원(SALESMAN)이면서 
---    급여가 $1600, $950, 또는 $1300 이 아닌 사원의 이름, 담당업무, 급여를 출력하시오.
+--    급여가 $1600, $950, 또는 $1300 이 아닌 사원의 이름, 담당업무, 급여를 출력하시오. not in()
 select ename , job, salary
 from employee
 where (job = 'CLERK' or job ='SALESMAN') and (salary <> 1600 and salary <> 950 and salary <> 1300); 

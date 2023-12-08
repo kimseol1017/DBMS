@@ -232,3 +232,141 @@ select to_date( 20040604,'YYYYMMDD')생일
 from dual;
 
 -- employee 테이블에서 2050년 12월 24일 까지 의 일수 를 출력
+
+
+/*
+그룹함수 : group by , having
+
+select 컴럼명
+from 테이블[뷰]
+where 조건
+group by 컬럼명(동일한 값을 그룹필)
+having 조건 [group by 한 결과 
+order by 조건
+*/
+
+/*
+집계함수 : number 타입    <===== null 값을 자동으로 처리됨
+    SUM_ 컬럼의 모든 값의 합
+    AVG- 컴럼의 모든값의 평균
+    MAX-컴럼의 최대값
+    MIN-컬럼의 최소값
+    COUNT (*) - 그루핑된 레코드 수 출력
+    
+    주의 : 단일행으로 출력이 되기 때문에 다른 컬럼과 사용시 오류
+    단, group by 열에 그룹핑된 컬럼은 출력 가능
+    
+*/
+desc employee
+
+-- 컬럼의 함수 사용 : 다른컬럼 찍으면 안됨
+ select SUM(salary) 합계, round(AVG(salary),2)평균 , MAX(salary)최대, MIN(salary)최소, COUNT(*)계산된레코드수 --단일 행으로 같은 컬럼명만 가능
+ from employee;
+ 
+ 
+ -- 집계함수는 NULL 을 자동으로 처리함.
+ select  commission
+ from employee
+
+select SUM(commission) 합계, round(AVG(commission),2)평균 , MAX(commission)최대, MIN(commission)최소, COUNT(*)계산된레코드수 --단일 행으로 같은 컬럼명만 가능
+ from employee;
+ 
+ 
+ -- 부서별로 월급의 합계 , 평균 ,최대월급, 최소월급, 그룹핑된 수를 출력
+ select dno 부서, SUM(salary)합계, round(AVG(salary))평균,
+ MAX(salary)최대, Min(salary)최소,count(*) as "그룹핑 된 수"
+ from employee
+ group by dno --dno 컬럼의 동일한 값을 그룹핑해서 집계함수를 적용함
+ order by dno asc
+  
+ select salary ,dno
+ from employee
+ order by dno asc
+ 
+ -- 직책별로 월급의 합계, 평균 , 최대값, 그룹핑된 수 
+ select job 직책, SUM(salary)합계, round(AVG(salary))평균,
+ MAX(salary)최대,count(*) as "그룹핑 된 수"
+from employee
+group by job
+order by job asc
+
+ select count(*)"전체 레코드수"
+ from employee
+ 
+ 
+ select dno (sum(salary)),count
+ from employee
+ group by boj,dno
+ 
+ -- SubQuery 사용해서 하나의 쿼리로 처리함
+ select ename, job
+ from employee
+ where job =(select job from employee where ename ='ALLEN');
+ 
+ --- SCOTT와 ALLEN의 직책에 해당되지 않는 사월들을 모두 출력
+ 
+    --1. SCOTT의 직책출력
+    --2. ALLEN의 직책출력
+    --3. Where job not in('SCOTT의 직책','ALLEN의 직책')
+    
+        --1. SCOTT의 직책출력
+select job from employee where ename = 'SCOTT'
+    --2. ALLEN의 직책출력
+select job from employee where ename = 'ALLEN'
+    --3. Where job not in('SCOTT의 직책','ALLEN의 직책')
+
+select ename , job 
+from employee 
+where job not in ('ANALYST','SALESMAN')
+
+-----서브쿼리로
+select ename , job 
+from employee 
+where job not in (
+(select job from employee where ename = 'SCOTT'),
+(select job from employee where ename = 'ALLEN'))
+
+select ename , job 
+from employee 
+where job not in (select job from employee 
+where ename = 'SCOTT' or ename = 'ALLEN')
+
+select ename , job 
+from employee 
+where job not in (select job from employee 
+where ename in ('SCOTT' ,'ALLEN'))
+
+--단일값 : =
+-- 여러개의 값 : in
+-- SCOTT보다 많은 월급을 받는 사원들 정보 와 월급을 출력
+select ename, salary
+from employee
+where salary > (select salary from employee where ename = 'SCOTT')
+order by salary ASC
+
+--최소 급여를 받는 사원들의 이름, 담당업무, 급여
+select ename , job, salary
+from employee
+where salary = (select Min(salary) from employee)
+order by job ASC
+
+select ename, salary
+from employee
+
+-- 부서별로 최소급여를 받는 사원 정보의 이름, 직책, 월급을 출력
+select ename, job , salary ,dno
+from employee
+where salary in (select Min(salary) from employee group by dno)
+order by dno asc
+
+-- 각 부서의 최소 금여가 30 번 부서 최소 급여보다 큰 부서를 출력, 이름 직책, 월급, 부서번호
+--select ename, job,min(salary) , dno
+--from employee
+--where salary > (select min(salary) from employee where dno = 30 group by dno) 
+--group by dno
+--order by dno asc 안되요 이거
+
+select min(salary) , dno
+from employee
+group by dno
+having min(salary)>(select min(salary) from employee where dno = 30)
