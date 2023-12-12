@@ -13,3 +13,5 @@ temporary tablespace TEMP;
 grant resource , connect to  C##Shoppging_DBre
 
 ALTER USER C##Shoppging_DBre quota unlimited on USERS;
+
+grant create view to C##Shoppging_DB;
